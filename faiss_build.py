@@ -1,5 +1,5 @@
-# file: faiss_build.py
-import json, numpy as np, faiss, boto3
+import json, faiss, boto3
+import numpy as np
 
 REGION = "us-east-1"
 EMBED_MODEL = "amazon.titan-embed-text-v1"

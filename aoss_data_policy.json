@@ -1,0 +1,20 @@
+[
+  {
+    "Description": "kb-rag data access",
+    "Rules": [
+      {
+        "ResourceType": "index",
+        "Resource": ["index/kb-rag/*"],
+        "Permission": ["aoss:*"]
+      },
+      {
+        "ResourceType": "collection",
+        "Resource": ["collection/kb-rag"],
+        "Permission": ["aoss:*"]
+      }
+    ],
+    "Principal": [
+      "arn:aws:iam::348823728620:user/sesac_JW"
+    ]
+  }
+]
