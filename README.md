@@ -1,3 +1,17 @@
+# AWS Bedrock + OpenSearch Serverless RAG Indexer
+
+이 프로젝트는 AWS Bedrock과 OpenSearch Serverless(AOSS)를 기반으로 한 Retrieval-Augmented Generation(RAG) 인덱서입니다.  
+S3에 업로드된 문서를 자동으로 임베딩하고 AOSS 인덱스에 저장하여 의미 기반 검색이 가능하도록 구성되었습니다.
+
+## 개요
+
+아키텍처 흐름:
+
+S3 업로드 → Lambda 트리거 → Bedrock 임베딩 생성 → AOSS 인덱스 저장
+
+markdown
+코드 복사
+
 ## 주요 기능
 
 - S3에 업로드된 `.txt`, `.md` 파일 자동 감지 및 처리
@@ -166,3 +180,6 @@ AWS Bedrock Titan Embed Text v1 (1536 dimensions)
 OpenSearch Serverless (KNN Vector Search)
 
 AWS Lambda (Serverless compute)
+
+yaml
+코드 복사
