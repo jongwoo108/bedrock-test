@@ -23,14 +23,15 @@ markdown
 
 ### 1. OpenSearch Serverless 컬렉션 생성
 
-```bash
+```
 aws opensearchserverless create-collection \
   --name kb-rag \
   --type VECTORSEARCH \
   --region us-east-1
+```
 2. Lambda 함수 생성
-bash
-코드 복사
+
+```
 cd lambda/kb-rag-indexer
 zip -r ../kb-rag-indexer.zip *
 aws lambda create-function \
@@ -40,9 +41,9 @@ aws lambda create-function \
   --handler app.lambda_handler \
   --zip-file fileb://../kb-rag-indexer.zip \
   --region us-east-1
+```
 3. 환경 변수 설정
-bash
-코드 복사
+```
 aws lambda update-function-configuration \
   --function-name kb-rag-indexer \
   --region us-east-1 \
@@ -52,9 +53,10 @@ aws lambda update-function-configuration \
     INDEX_NAME=kb-rag,
     EMBEDDING_MODEL=amazon.titan-embed-text-v1
   }"
+```
 4. IAM 권한
 Lambda 실행 역할에 다음 권한이 필요합니다:
-
+```
 json
 코드 복사
 {
@@ -77,22 +79,23 @@ json
     }
   ]
 }
+```
 5. AOSS 데이터 접근 정책
-bash
-코드 복사
+```
 aws opensearchserverless put-access-policy \
   --name kb-rag-writer \
   --type data \
   --policy file://aoss-access-simplified.json \
   --region us-east-1
+```
 6. 인덱스 생성 및 매핑 확인
-bash
-코드 복사
+```
 python recreate_index.py
 python check_mapping.py
-프로젝트 구조
-python
-코드 복사
+```
+
+## 프로젝트 구조
+```
 ├── lambda/
 │   └── kb-rag-indexer/
 │       ├── app.py                 # Lambda 함수 코드
@@ -103,20 +106,16 @@ python
 ├── get_full_logs.py               # CloudWatch 로그 확인
 ├── check_success.py               # 성공 여부 점검
 └── README.md
-Lambda 함수 설명
+```
+## Lambda 함수 설명
 lambda/kb-rag-indexer/app.py는 다음을 수행합니다:
+1. S3 이벤트 수신 및 문서 경로 파싱
+2. 문서 본문 읽기 (.txt, .md 지원)
+3. Bedrock Titan 임베딩 모델을 사용하여 벡터 생성
+4. AOSS에 문서 및 임베딩 업서트
 
-S3 이벤트 수신 및 문서 경로 파싱
-
-문서 본문 읽기 (.txt, .md 지원)
-
-Bedrock Titan 임베딩 모델을 사용하여 벡터 생성
-
-AOSS에 문서 및 임베딩 업서트
-
-코드 예시
-python
-코드 복사
+## 코드 예시
+```
 def _embed(text: str):
     payload = {"inputText": text[:4000]}
     resp = bedrock.invoke_model(
@@ -131,28 +130,26 @@ def _index_doc(doc_id: str, text: str, vector):
     url = f"{AOSS_ENDPOINT}/{INDEX_NAME}/_doc"
     body = {"id": doc_id, "content": text, "embedding": vector}
     requests.post(url, headers={"x-amz-collection-name": COLLECTION_NAME}, data=json.dumps(body))
-모니터링 및 디버깅
-get_full_logs.py: CloudWatch 로그 스트림 전체 확인
+```
 
-check_success.py: 최근 인덱싱 성공 여부 확인
-
-recreate_index.py: 인덱스 매핑 재생성
-
+## 모니터링 및 디버깅
+- get_full_logs.py: CloudWatch 로그 스트림 전체 확인
+- check_success.py: 최근 인덱싱 성공 여부 확인
+- recreate_index.py: 인덱스 매핑 재생성
 성공 로그 예시:
 
-pgsql
-코드 복사
+```
 [DEBUG] Using embedding model: amazon.titan-embed-text-v1
 [DEBUG] Response status: 201
 Indexed: s3::your-bucket/docs/document.md
-문제 해결
-403 Forbidden: IAM 권한 또는 AOSS 데이터 접근 정책 검증 필요
+```
 
-400 Bad Request: 임베딩 차원 불일치 확인 (Titan v1 = 1536차원)
+## 문제 해결
+1. 403 Forbidden: IAM 권한 또는 AOSS 데이터 접근 정책 검증 필요
+2. 400 Bad Request: 임베딩 차원 불일치 확인 (Titan v1 = 1536차원)
+3. ValidationException: 환경변수 또는 모델 ID 확인 필요
 
-ValidationException: 환경변수 또는 모델 ID 확인 필요
-
-사용 예시
+## 사용 예시
 문서 업로드 및 인덱싱
 bash
 코드 복사
@@ -172,14 +169,8 @@ def search(query_vector, k=5):
         }
     )
     return response
-버전 정보
-Python 3.12
-
-AWS Bedrock Titan Embed Text v1 (1536 dimensions)
-
-OpenSearch Serverless (KNN Vector Search)
-
-AWS Lambda (Serverless compute)
-
-yaml
-코드 복사
+## 버전 정보
+- Python 3.12
+- AWS Bedrock Titan Embed Text v1 (1536 dimensions)
+- OpenSearch Serverless (KNN Vector Search)
+- AWS Lambda (Serverless compute)
