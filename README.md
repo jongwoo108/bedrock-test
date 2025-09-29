@@ -29,7 +29,7 @@ aws opensearchserverless create-collection \
   --type VECTORSEARCH \
   --region us-east-1
 ```
-2. Lambda 함수 생성
+### 2. Lambda 함수 생성
 
 ```
 cd lambda/kb-rag-indexer
@@ -42,7 +42,7 @@ aws lambda create-function \
   --zip-file fileb://../kb-rag-indexer.zip \
   --region us-east-1
 ```
-3. 환경 변수 설정
+### 3. 환경 변수 설정
 ```
 aws lambda update-function-configuration \
   --function-name kb-rag-indexer \
@@ -54,7 +54,7 @@ aws lambda update-function-configuration \
     EMBEDDING_MODEL=amazon.titan-embed-text-v1
   }"
 ```
-4. IAM 권한
+### 4. IAM 권한
 Lambda 실행 역할에 다음 권한이 필요합니다:
 ```
 json
@@ -80,7 +80,7 @@ json
   ]
 }
 ```
-5. AOSS 데이터 접근 정책
+### 5. AOSS 데이터 접근 정책
 ```
 aws opensearchserverless put-access-policy \
   --name kb-rag-writer \
@@ -88,7 +88,7 @@ aws opensearchserverless put-access-policy \
   --policy file://aoss-access-simplified.json \
   --region us-east-1
 ```
-6. 인덱스 생성 및 매핑 확인
+### 6. 인덱스 생성 및 매핑 확인
 ```
 python recreate_index.py
 python check_mapping.py
