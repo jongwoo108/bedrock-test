@@ -1,0 +1,36 @@
+[
+  {
+    "Description": "Lambda indexer access to kb-rag collection",
+    "Rules": [
+      {
+        "ResourceType": "index",
+        "Resource": [
+          "index/kb-rag/*",
+          "index/iwvt29rkcwesncyf8sw8/*",
+          "index/kb-rag/kb-rag*",
+          "index/iwvt29rkcwesncyf8sw8/kb-rag*"
+        ],
+        "Permission": [
+          "aoss:DescribeIndex",
+          "aoss:ReadDocument",
+          "aoss:WriteDocument",
+          "aoss:CreateIndex",
+          "aoss:UpdateIndex"
+        ]
+      },
+      {
+        "ResourceType": "collection",
+        "Resource": [
+          "collection/kb-rag",
+          "collection/iwvt29rkcwesncyf8sw8"
+        ],
+        "Permission": [
+          "aoss:DescribeCollectionItems"
+        ]
+      }
+    ],
+    "Principal": [
+      "arn:aws:iam::348823728620:role/kb-rag-indexer-role"
+    ]
+  }
+]
